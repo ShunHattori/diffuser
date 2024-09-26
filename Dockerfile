@@ -1,6 +1,53 @@
-FROM nvidia/cuda:11.1.1-cudnn8-runtime-ubuntu20.04
+FROM nvidia/cudagl:11.1-base-ubuntu20.04
 
 SHELL ["/bin/bash", "-c"]
+
+# Install packages without prompting the user to answer any questions
+ENV DEBIAN_FRONTEND=noninteractive
+RUN sed -i 's@archive.ubuntu.com@ftp.jaist.ac.jp/pub/Linux@g' /etc/apt/sources.list
+
+
+ARG USR_NAME=shun-hat
+#####################################################
+# Install common apt packages
+#####################################################
+RUN rm /etc/apt/sources.list.d/cuda.list
+RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+RUN apt-key del 7fa2af80
+RUN apt-get update && apt-get install -y --no-install-recommends wget
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb
+RUN dpkg -i cuda-keyring_1.0-1_all.deb
+
+RUN apt-get update && apt-get install -y \
+    ### utility
+    locales \
+    xterm \
+    dbus-x11 \
+    terminator \
+    sudo \
+    ### tools
+    unzip \
+    lsb-release \
+    curl \
+    ffmpeg \
+    net-tools \
+    software-properties-common \
+    subversion \
+    libssl-dev \
+    ### Development tools
+    build-essential \
+    htop \
+    git \
+    vim \
+    gedit \
+    gdb \
+    valgrind \
+    ## track ik
+    libnlopt-cxx-dev \
+    swig \
+    libgflags-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 ##########################################################
 ### System dependencies
@@ -9,19 +56,11 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update -q \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     cmake \
-    curl \
-    git \
     libgl1-mesa-dev \
     libgl1-mesa-glx \
     libglew-dev \
     libosmesa6-dev \
-    ffmpeg \
-    net-tools \
     parallel \
-    software-properties-common \
-    swig \
-    unzip \
-    vim \
     wget \
     xpra \
     xserver-xorg-dev \
@@ -29,7 +68,16 @@ RUN apt-get update -q \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ENV LANG C.UTF-8
+
+#####################################################
+# Set locale & time zone
+#####################################################
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+ENV TZ=Asia/Tokyo
+
 
 COPY ./azure/files/Xdummy /usr/local/bin/Xdummy
 RUN chmod +x /usr/local/bin/Xdummy
@@ -96,3 +144,22 @@ RUN source ~/.bashrc
 
 RUN mkdir /home/code
 RUN mkdir /home/logs
+
+
+#####################################################
+# Run scripts (commands)
+#####################################################
+
+### bashrc settings to activate conda environment
+RUN echo "conda activate diffuser" >> /root/.bashrc
+
+### terminator window settings
+COPY assets/config /
+
+### user group settings
+COPY assets/entrypoint_setup.sh /
+ENTRYPOINT ["/entrypoint_setup.sh"]
+
+# Run terminator
+CMD ["terminator"]
+
