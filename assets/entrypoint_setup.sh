@@ -116,7 +116,8 @@ setup_specific_user_setting () {
 setup_python_package () {
     cd /home/$DOCKER_USER_NAME/diffuser
     pip install -e .
-    sudo chown -R shun-hat:shun-hat /opt/conda/envs/diffuser/
+    sudo chown -R $DOCKER_USER_NAME:$DOCKER_USER_NAME /opt/conda/envs/diffuser/
+    sudo chown -R $DOCKER_USER_NAME:$DOCKER_USER_NAME /home/$DOCKER_USER_NAME/diffuser/
 }
 
 

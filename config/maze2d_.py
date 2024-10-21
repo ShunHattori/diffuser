@@ -55,13 +55,13 @@ base = {
         ## training
         "n_steps_per_epoch": 10000,
         "loss_type": "l2",
-        "n_train_steps": 40000,
+        "n_train_steps": 50000,
         "batch_size": 32,
         "learning_rate": 2e-4,
         "gradient_accumulate_every": 2,
         "ema_decay": 0.995,
-        "save_freq": 20000,
-        "sample_freq": 20000,
+        "save_freq": 1000,
+        "sample_freq": 1000,
         "n_saves": 50,
         "save_parallel": False,
         "n_reference": 50,
@@ -100,12 +100,12 @@ base = {
 
 maze2d_umaze_v1 = {
     "diffusion": {
-        "horizon": 128,
-        "n_diffusion_steps": 64,
+        "horizon": 512,
+        "n_diffusion_steps": 256,
     },
     "plan": {
-        "horizon": 128,
-        "n_diffusion_steps": 64,
+        "horizon": 512,
+        "n_diffusion_steps": 256,
     },
 }
 
@@ -119,3 +119,13 @@ maze2d_large_v1 = {
         "n_diffusion_steps": 256,
     },
 }
+
+
+# command
+# python scripts/train.py --config config.maze2d_partially_path --dataset maze2d-umaze-v1
+# python scripts/train.py --config config.maze2d_long_horizon_large_diffusion_step --dataset maze2d-umaze-v1
+# python scripts/train.py --config config.maze2d_long_horizon_large_diffusion_step_little_data --dataset maze2d-umaze-v1
+# python scripts/plan_maze2d.py --config config.maze2d_partially_path --dataset maze2d-umaze-v1
+# python testscripts/sample_plan_maze2d.py --horizon 384 --n_diffusion_steps 256 --diffusion_loadpath 'f:diffusion/H128_T64'
+# python testscripts/sample_plan_maze2d.py --horizon 512 --n_diffusion_steps 64  --diffusion_loadpath 'f:diffusion/H{horizon}_T{n_diffusion_steps}'
+# python testscripts/sample_plan_maze2d.py --horizon 512 --n_diffusion_steps 256  --diffusion_loadpath 'f:diffusion/H{horizon}_T{n_diffusion_steps}'
