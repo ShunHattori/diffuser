@@ -26,12 +26,14 @@ class SequenceDataset(torch.utils.data.Dataset):
         fields = ReplayBuffer(max_n_episodes, max_path_length, termination_penalty)
         for i, episode in enumerate(itr):
             fields.add_path(episode)
-            print(episode["observations"].shape)  # 個々のサイズはバラバラ
+            # print(episode["observations"].shape)  # 個々のサイズはバラバラ
         fields.finalize()
+        print(f"{fields.n_episodes=}")
 
         self.normalizer = DatasetNormalizer(fields, normalizer, path_lengths=fields["path_lengths"])
         print(f"{fields.path_lengths=}")
         self.indices = self.make_indices(fields.path_lengths, horizon)
+        print(f"{horizon=}")
         print(f"{self.indices=}")
         print(f"{self.indices.shape=}")
 
@@ -103,6 +105,17 @@ class GoalDataset(SequenceDataset):
             0: observations[0],
             self.horizon - 1: observations[-1],
         }
+
+
+class GoalDataset_limited_episodes(GoalDataset):
+    # 学習に使用されるエピソード数を制限する
+    def __init__(self, env="hopper-medium-replay", horizon=64, normalizer="LimitsNormalizer", preprocess_fns=[], max_path_length=1000, max_n_episodes=20000, termination_penalty=0, use_padding=True, num_limit_episodes=20000):
+        super().__init__(env, horizon, normalizer, preprocess_fns, max_path_length, max_n_episodes, termination_penalty, use_padding)
+        indices = np.random.choice(len(self.indices), num_limit_episodes, replace=False)
+        self.indices = self.indices[indices]
+        print(f"LIMITED EPISODES: {len(self.indices)=}")
+        print(f"{self.indices=}")
+        print(f"{self.indices.shape=}")
 
 
 class ValueDataset(SequenceDataset):

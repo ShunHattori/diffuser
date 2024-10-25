@@ -72,7 +72,7 @@ print(diffusion_chain[0].shape)  # n_diffusion_step , batch , horizon, state dim
 
 # utils.colab.show_sample(renderer, diffusion_chain[-1], savebase="./media")
 for i, horizon in enumerate(horizons):
-    utils.colab.show_diffusion(renderer, diffusion_chain[i], savebase=f"./media_{args.dataset}_trainH{args.horizon}_DS{args.n_diffusion_steps}_inferH{horizon}")  # sample horizon
+    utils.colab.show_diffusion(renderer, diffusion_chain[i], savebase=f"./media_{args.dataset}_trainH{args.horizon}_DS{args.n_diffusion_steps}_inferH{horizon}_LIMIT5e4")  # sample horizon
 # policy = Policy(diffusion, dataset.normalizer)
 
 

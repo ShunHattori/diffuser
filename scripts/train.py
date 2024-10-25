@@ -29,6 +29,7 @@ dataset_config = utils.Config(
     preprocess_fns=args.preprocess_fns,
     use_padding=args.use_padding,
     max_path_length=args.max_path_length,
+    num_limit_episodes=args.num_limit_episodes,
 )
 
 render_config = utils.Config(
